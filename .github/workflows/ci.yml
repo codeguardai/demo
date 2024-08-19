@@ -1,0 +1,87 @@
+name: Demo CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+      # Use the guardai action to run the GuardAI analysis
+      - name: Run GuardAI Action
+        id: guardai
+        uses: codeguardai/guardai-action@v0.1.0
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          provider: "openai"
+          directory: "src"
+          output_file: "guardai_output.txt"
+
+      - name: Check GuardAI Output
+        shell: bash
+        run: |
+          guardai_output_file="guardai_output.txt"
+
+          # Check if the output file exists and is not empty
+          if [[ ! -s "$guardai_output_file" ]]; then
+            echo "No output detected from GuardAI action."
+            exit 1
+          fi
+
+          echo "GuardAI action produced output successfully."
+
+      - name: Comment GuardAI Output to PR
+        uses: actions/github-script@v7
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          script: |
+            const fs = require('fs');
+
+            const output = fs.readFileSync('guardai_output.txt', 'utf8');
+
+            const pullRequests = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`
+            })
+
+            const issueNumber = context.issue.number || pullRequests.data[0].number
+
+            const {data: comments} = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+            })
+            const botComment = comments.find(comment => {
+                return comment.user.type === 'Bot' && comment.body.includes('GuardAI Output')
+            })
+
+            const commentBody = `## GuardAI Output\n\n<details><summary>View Results</summary>\n\n${output}\n\n</details>`;
+
+            // If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+                await github.rest.issues.updateComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    comment_id: botComment.id,
+                    body: commentBody
+                })
+            } else {
+                await github.rest.issues.createComment({
+                    issue_number: issueNumber,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: commentBody
+                })
+            }
