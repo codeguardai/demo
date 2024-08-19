@@ -16,10 +16,9 @@ GuardAI can be integrated into your CI pipeline using GitHub Actions/Workflows. 
 1. **Run GuardAI Action**: The action scans the code in the `src` directory and outputs the results to a file (`guardai_output.txt`).
 2. **Comment on PR**: The content of the `guardai_output.txt` file is automatically posted as a collapsible comment on the pull request, allowing reviewers to easily view the scan results.
 
-Example of how the GuardAI output is commented on a PR:
+Example of how the GuardAI output is [commented](https://github.com/codeguardai/demo/pull/2#issuecomment-2295672871) on a PR:
 
-![PR Comment Example]()  
-_Placeholder GIF: This GIF represents how GuardAI comments its findings directly in a pull request. Replace with an actual GIF showing the feature in action._
+![PR Comment Example](pr-demo.png)
 
 ## Local CLI Usage
 
