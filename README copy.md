@@ -9,7 +9,7 @@ This demo provides an overview of how the GuardAI tool can be used both in a CI 
 GuardAI can be integrated into your CI pipeline using GitHub Actions/Workflows. In this example, the workflow is configured to run on pull requests targeting the `main` branch. The action scans the code in the specified directory and generates a report. The workflow then posts the results as a comment on the pull request.
 
 - **Workflow File**: [Demo CI Workflow](https://github.com/codeguardai/demo/.github/workflows/ci.yml)
-- **Pull Request Example**: [#123: Demonstration PR](https://github.com/codeguardai/demo/pull/2)
+- **Pull Request Example**: [#123: Demonstration PR](https://github.com/codeguardai/demo/pull/1)
 
 ### Pull Request Workflow
 
