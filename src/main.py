@@ -11,7 +11,7 @@ def execute_command(command):
 
 
 def login(username, password):
-    if username == "admin" and password == "password123":
+    if username == "admin" and password == "password12":
         print("Login successful!")
     else:
         print("Login failed!")
